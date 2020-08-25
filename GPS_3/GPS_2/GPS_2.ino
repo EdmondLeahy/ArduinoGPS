@@ -16,7 +16,8 @@ void setup() {
   GPS.sendCommand("$PGCMD,33,0*6D"); // Turn off Antenna Uptdate
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // Set Update rate to 1hz
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Only send RMC and GGA
-  delay(1000);
+  //GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA); // Only send RMC and GGA
+  delay(100);
   //ADAFRUIT GPS:
   //    vin -- 5v
   //    gnd -- gnd
@@ -29,15 +30,15 @@ void setup() {
 void loop() {
 
   readGPS();
-  
   if (GPS.fix == 1){
-    
+
+    GPS.parse(GPS.lastNMEA());
     degWhole=float(int(GPS.longitude/100)); //gives me the whole degree part of Longitude
     degDec = (GPS.longitude - degWhole*100)/60; //give me fractional part of longitude
     deg = degWhole + degDec; //Gives complete correct decimal form of Longitude degrees
     if (GPS.lon=='W') {  //If you are in Western Hemisphere, longitude degrees should be negative
       deg= (-1)*deg;
-  }
+    }
   Serial.print(deg,4); 
   Serial.print(", "); 
   
@@ -48,38 +49,24 @@ void loop() {
   if (GPS.lat=='S') {  //If you are in Southern hemisphere latitude should be negative
     deg= (-1)*deg;
   }
-  Serial.print(deg,4); 
-  Serial.println(","); 
-  }
+  Serial.print(deg,4);  
+  Serial.print(", "); 
+
+  // Print the height
+  Serial.print(GPS.altitude);
+  Serial.println(",    ");
+//  Serial.println(GPS.lastNMEA()); 
   
+  }
 }
 
 void readGPS(){
-  clearGPS();
+  //clearGPS();
   while(!GPS.newNMEAreceived()){
     c = GPS.read();
   }
-
+  
   GPS.parse(GPS.lastNMEA());
-  NMEA1 = GPS.lastNMEA();
-
-  while(!GPS.newNMEAreceived()){
-    c = GPS.read();
-  }
-
-  GPS.parse(GPS.lastNMEA());
-  NMEA2 = GPS.lastNMEA();
-
- 
-
-}
-
-void clearGPS() {
-  while(!GPS.newNMEAreceived()){
-    c = GPS.read();
-  }
-
-  //GPS.parse(GPS.lastNMEA());
 
 }
 
