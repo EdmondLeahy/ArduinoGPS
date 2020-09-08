@@ -3,8 +3,8 @@
 SoftwareSerial serial1(3,2);
 Adafruit_GPS GPS(&serial1);
 
-String NMEA1;
-String NMEA2;
+char* NMEA1;
+char* NMEA2;
 char c; 
 float deg; //Will hold positin data in simple degree format
 float degWhole; //Variable for the whole part of position
@@ -15,8 +15,9 @@ void setup() {
   GPS.begin(9600);
   GPS.sendCommand("$PGCMD,33,0*6D"); // Turn off Antenna Uptdate
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ); // Set Update rate to 1hz
-//  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Only send RMC and GGA
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA); // Only send RMC and GGA
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA); // Only send RMC and GGA
+  //GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA); // Only send RMC and GGA
+  //GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY); // Only send RMC 
   delay(100);
   //ADAFRUIT GPS:
   //    vin -- 5v
@@ -30,8 +31,10 @@ void loop() {
 
   readGPS();
   if (GPS.fix == 1){
-  Serial.print(GPS.lastNMEA()); 
+   Serial.println(NMEA2); 
+   //Serial.println("test");
   }
+  delay(10);
 }
 
 void readGPS(){
@@ -39,8 +42,13 @@ void readGPS(){
   while(!GPS.newNMEAreceived()){
     c = GPS.read();
   }
-  
-  GPS.parse(GPS.lastNMEA());
+  NMEA1 = GPS.lastNMEA();
+  GPS.parse(NMEA1);
+  while(!GPS.newNMEAreceived()){
+    c = GPS.read();
+  }
+  NMEA2 = GPS.lastNMEA();
+  GPS.parse(NMEA2);
 
 }
 
