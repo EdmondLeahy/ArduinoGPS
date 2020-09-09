@@ -1,3 +1,4 @@
+#include "Nmea_spoof_internal.h"
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
 SoftwareSerial serial1(3,2);
@@ -53,6 +54,8 @@ void loop() {
 //      nmea.replace(nmea.substring(19,28), "999.9390");
 //      nmea.replace(nmea.substring(19,28), "999.9390");
 //      nmea.replace(nmea.substring(29,30), side);
+        int num_comma = find_location_of_lat(nmea);
+        Serial.println(num_comma);
         nmea[29] = *Hemisphere;
         add_crc_and_print(nmea.substring(1,nmea.indexOf("*")+1));
         //Serial.println();
@@ -68,11 +71,6 @@ void readGPS(){
   
   GPS.parse(GPS.lastNMEA());
 
-}
-
-String add_spoofed_lat(String gga_original, String latitude_new){
-    return "Test"
-  
 }
 
 
